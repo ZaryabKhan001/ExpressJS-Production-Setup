@@ -2,6 +2,10 @@ import type { Request, Response } from 'express';
 import { z } from 'zod';
 
 import { validateBody } from '~/middlewares/validate.middleware.js';
+import {
+  ConflictError,
+  UnauthorizedError,
+} from '~/utils/errors/http-errors.js';
 
 import {
   retrieveUserProfileFromDatabaseByEmail,
@@ -31,11 +35,7 @@ export const handleUserRegisteration = async (
   const existingUser = await retrieveUserProfileFromDatabaseByEmail(body.email);
 
   if (existingUser) {
-    response.status(409).json({
-      success: false,
-      message: 'User already exists.',
-    });
-    return;
+    throw new ConflictError('User already exists.');
   }
 
   const hashedPassword = await hashPassword(body.password);
@@ -53,7 +53,6 @@ export const handleUserRegisteration = async (
     success: true,
     message: 'User registered successfully.',
   });
-  return;
 };
 
 export const handleUserLogin = async (
@@ -74,11 +73,7 @@ export const handleUserLogin = async (
     !user ||
     !(await getIsPasswordValid(body.password, user.hashedPassword))
   ) {
-    response.status(401).json({
-      success: false,
-      message: 'Invalid credentials',
-    });
-    return;
+    throw new UnauthorizedError('Invalid credentials');
   }
 
   const token = generateJwtToken(user);

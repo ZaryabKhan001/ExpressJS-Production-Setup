@@ -1,5 +1,5 @@
-// src/middlewares/error-handler.ts
-import type { Request, Response } from 'express';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import type { NextFunction, Request, Response } from 'express';
 import { ZodError } from 'zod';
 
 import { Prisma } from '../../generated/prisma/client.js';
@@ -12,6 +12,7 @@ export function errorHandler(
   error: unknown,
   _request: Request,
   response: Response,
+  _next: NextFunction,
 ): void {
   let normalizedError = error;
 
@@ -28,6 +29,7 @@ export function errorHandler(
   // Known app errors
   if (normalizedError instanceof AppError) {
     response.status(normalizedError.statusCode).json({
+      success: false,
       message: normalizedError.message,
     });
     return;
@@ -35,6 +37,7 @@ export function errorHandler(
 
   // Unknown / programming errors
   response.status(500).json({
+    success: false,
     message:
       process.env.NODE_ENV === 'production'
         ? 'Internal server error'
