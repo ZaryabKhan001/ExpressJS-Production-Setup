@@ -1,6 +1,7 @@
 import cookieParser from 'cookie-parser';
 import express, { type Express } from 'express';
 
+import { errorHandler } from './middlewares/error-handler.middleware.js';
 import { apiV1Router } from './routes.js';
 
 export const buildApp = (): Express => {
@@ -11,6 +12,9 @@ export const buildApp = (): Express => {
   app.use(cookieParser());
   // Group routes under /api/v1
   app.use('/api/v1', apiV1Router);
+
+  // Global error handler
+  app.use(errorHandler);
 
   return app;
 };
