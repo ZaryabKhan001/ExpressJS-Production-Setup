@@ -1,0 +1,38 @@
+import { describe, expect, test } from 'vitest';
+
+import {
+  generateJwtToken,
+  getIsPasswordValid,
+  hashPassword,
+} from './user-authentication.helper.js';
+
+describe('generateJwtToken()', () => {
+  test('given: A user profile, should: return a JWT token', async () => {
+    const userProfile = {
+      id: 'ozlnvq593weqj51j5p69adul',
+      email: 'Jamarcus.Haag44@hotmail.com',
+      name: 'Dr. Philip Lindgren',
+      createdAt: new Date('2022-09-25T20:03:54.119Z'),
+      updatedAt: new Date('2025-01-29T11:25:38.342Z'),
+      hashedPassword: 'b6d93ffb-8093-4940-bd1f-c9e8020851e4',
+    };
+    const jwtToken = generateJwtToken(userProfile);
+
+    const actual = jwtToken.startsWith('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9');
+    const expected = true;
+
+    expect(actual).toEqual(expected);
+  });
+});
+
+describe('getIsPasswordValid() & hashPassword()', () => {
+  test('given: a password, should: return a hashed password', async () => {
+    const password = 'password123';
+    const hashedPassword = await hashPassword(password);
+
+    const actual = await getIsPasswordValid(password, hashedPassword);
+    const expected = true;
+
+    expect(actual).toEqual(expected);
+  });
+});
