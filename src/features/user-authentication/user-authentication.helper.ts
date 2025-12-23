@@ -52,7 +52,7 @@ export const generateJwtToken = (userProfile: UserProfile) => {
     email: userProfile.email,
   };
   return jwt.sign(tokenPayload, config.jwtSecret as string, {
-    expiresIn: 15 * 60 * 1000, // 15 mints
+    expiresIn: '15m', // 15 mints
   });
 };
 
