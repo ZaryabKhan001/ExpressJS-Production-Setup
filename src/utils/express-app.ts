@@ -12,11 +12,10 @@ app.get(
   async (request: Request, response: Response, next: NextFunction) => {
     try {
       // Inline usage of require authentication to get token
-      const { id, email } = await requireAuthentication(request, response);
+      await requireAuthentication(request, response, next);
       response.status(200).json({
         success: true,
-        message: `Hello, ${email}. Your user ID is ${id}`,
-        userId: id,
+        message: `Hello,`,
       });
     } catch (error) {
       next(error);
