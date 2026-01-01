@@ -87,7 +87,7 @@ export const handleUserLogin = async (
 export const handleUserLogout = async (
   request: Request,
   response: Response,
-) => {
+): Promise<void> => {
   clearJwtCookie(response);
   response.status(200).json({
     success: true,

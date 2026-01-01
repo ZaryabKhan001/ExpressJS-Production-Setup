@@ -10,7 +10,10 @@ import {
   retrieveUserProfileFromDatabaseByEmail,
   saveUserProfileToDatabase,
 } from '../user-profile/user-profile.model.js';
-import { hashPassword } from './user-authentication.helper.js';
+import {
+  generateJwtToken,
+  hashPassword,
+} from './user-authentication.helper.js';
 
 // Setup of express server that we are going to use.
 export const setup = async ({
@@ -195,17 +198,35 @@ describe('/api/v1/register', () => {
 
 /** Logout Tests */
 describe('/api/v1/logout', () => {
-  test('given: any POST request, should: clear the JWT cookie and return a 200', async () => {
+  test('should: return 401 if user is not authenticated', async () => {
     const app = buildApp();
-    const actual = await request(app).post('/api/v1/logout').expect(200);
 
-    expect(actual.body).toEqual({
+    const response = await request(app).post('/api/v1/logout').expect(401);
+
+    expect(response.body).toEqual({
+      success: false,
+      message: 'Unauthenticated!',
+    });
+  });
+
+  test('should: clear JWT cookie and return 200 for authenticated user', async () => {
+    const password = createId();
+    const { app, userProfile } = await setup({ password });
+
+    const token = generateJwtToken(userProfile);
+
+    const response = await request(app)
+      .post('/api/v1/logout')
+      .set('Cookie', [`jwt=${token}`])
+      .expect(200);
+
+    expect(response.body).toEqual({
       success: true,
       message: 'Logout Successfully',
     });
 
-    // verify that cookie is cleared
-    const cookies = actual.headers['set-cookie'] as unknown as string[];
+    // verify cookie is cleared
+    const cookies = response.headers['set-cookie'] as unknown as string[];
     expect(cookies).toBeDefined();
     expect(cookies).toEqual([
       'jwt=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; SameSite=Strict',
