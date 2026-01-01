@@ -1,5 +1,6 @@
 # Ignore all env files
 .env*
+.env.test
 # But keep .env.example in version control
 !.env.example
 
