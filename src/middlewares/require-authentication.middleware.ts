@@ -7,7 +7,8 @@ export const requireAuthentication = async (
   response: Response,
 ) => {
   try {
-    return getJwtTokenFromCookie(request);
+    const decodedToken = getJwtTokenFromCookie(request);
+    request.user = decodedToken;
   } catch {
     throw response.status(401).json({
       success: false,
